@@ -9,38 +9,16 @@ import (
 
 	"github.com/VDiPaola/api-network-server/helpers"
 	"github.com/VDiPaola/api-network-server/models"
+	"github.com/VDiPaola/api-network-server/options"
 )
-
-type Options struct {
-	RateLimitAmount   uint //amount of request per RateLimitInterval
-	RateLimitInterval time.Duration
-	//MaxRequestsPerMinute uint
-	MaxResponseDuration time.Duration //max time a node is allowed to respond in
-	NodeRedundencyCount uint          //how many nodes to ask a request to simultaneously
-	HealthCheckDuration time.Duration //how long to wait before considering a node inactive
-	CacheUpdateInterval time.Duration
-	HasCache            bool
-	ScoreThreshold      int64
-}
-
-var options = Options{
-	RateLimitAmount:     300,
-	RateLimitInterval:   time.Duration(time.Minute * 5),
-	MaxResponseDuration: time.Duration(time.Millisecond * 100),
-	NodeRedundencyCount: 2,
-	HealthCheckDuration: time.Duration(time.Minute * 15),
-	CacheUpdateInterval: time.Duration(time.Minute * 5),
-	HasCache:            true,
-	ScoreThreshold:      10,
-}
 
 var nodes = make([]models.Node, 0)
 
 //request queue
 
-func Init(newOptions Options) {
-	//load options
-	options = newOptions
+func Init(newOptions helpers.OptionsType) {
+	//set options
+	options.Set(newOptions)
 
 	//caching
 
@@ -56,12 +34,9 @@ func AddNode(node models.Node) {
 	nodes = append(nodes, node)
 }
 
-func healthCheck(node models.Node) {
-	//pinged from the node to show its active
-}
-
 func selectNodes() []models.Node {
 	//returns array of nodes selected for requests
+	options := options.Get()
 	if len(nodes) == int(options.NodeRedundencyCount) {
 		return nodes
 	}
@@ -83,6 +58,7 @@ func selectNodes() []models.Node {
 
 func getReadyNodes() []models.Node {
 	//get nodes that are valid to make a request
+	options := options.Get()
 	newNodes := []models.Node{}
 	for i := range nodes {
 		requestCountCheck(nodes[i])
@@ -95,6 +71,7 @@ func getReadyNodes() []models.Node {
 }
 
 func requestCountCheck(node models.Node) {
+	options := options.Get()
 	//resets request count if RateLimitInterval passed
 	if node.NextRequestCountResetTime.Unix() <= time.Now().Unix() {
 		node.RequestCount = 0
@@ -104,6 +81,7 @@ func requestCountCheck(node models.Node) {
 
 func cleanNodes() {
 	//removes nodes that dont meet criteria
+	options := options.Get()
 	newNodes := []models.Node{}
 	for i := range nodes {
 		con1 := nodes[i].LastResponseUnix-time.Now().Unix() > int64(options.HealthCheckDuration.Seconds())
@@ -134,7 +112,7 @@ func Request(endpoint string, method helpers.RequestMethodType, body interface{}
 
 func processRequest(node models.Node, endpoint string, method helpers.RequestMethodType, body interface{}, callback helpers.RequestCallbackType) {
 	//run request on node
-
+	options := options.Get()
 	//time request
 	start := time.Now()
 

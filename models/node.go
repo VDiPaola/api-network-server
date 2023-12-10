@@ -5,6 +5,7 @@ import "time"
 type Node struct {
 	Id                  uint   `gorm:"primary_key" json:"id"`
 	IP                  string `json:"ip"`
+	Port                string `json:"port"`
 	Score               int64  `gorm:"default:100" json:"score"`
 	Priority            int64  `gorm:"default:0" json:"priority"`
 	CreatedAtUnix       int64  `gorm:"autoCreateTime" json:"created_at"`
