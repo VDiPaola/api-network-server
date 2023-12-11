@@ -24,16 +24,6 @@ func Init(newOptions helpers.OptionsType) {
 
 }
 
-func AddNodes(nodeArray []models.Node) {
-	for _, node := range nodeArray {
-		AddNode(node)
-	}
-}
-
-func AddNode(node models.Node) {
-	nodes = append(nodes, node)
-}
-
 func selectNodes() []models.Node {
 	//returns array of nodes selected for requests
 	options := options.Get()
@@ -83,12 +73,12 @@ func cleanNodes() {
 	//removes nodes that dont meet criteria
 	options := options.Get()
 	newNodes := []models.Node{}
-	for i := range nodes {
-		con1 := nodes[i].LastResponseUnix-time.Now().Unix() > int64(options.HealthCheckDuration.Seconds())
-		con2 := nodes[i].IsActive
-		con3 := nodes[i].Score+nodes[i].Priority > options.ScoreThreshold
+	for _, node := range nodes {
+		con1 := node.LastResponseUnix-time.Now().Unix() > int64(options.HealthCheckDuration.Seconds())
+		con2 := node.IsActive
+		con3 := node.Score+node.Priority > options.ScoreThreshold
 		if con1 && con2 && con3 {
-			newNodes = append(newNodes, nodes[i])
+			newNodes = append(newNodes, node)
 		}
 	}
 
