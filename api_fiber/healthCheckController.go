@@ -14,9 +14,9 @@ func NodeHealthCheck(c *fiber.Ctx) error {
 	if err := c.BodyParser(&node); err != nil {
 		return c.Status(503).SendString(err.Error())
 	}
-	fmt.Println(fmt.Sprintf("%v", node))
+	fmt.Printf("%+v\n", node)
 
 	nodes.HealthCheck(node)
 
-	return c.Status(200).SendString("hi")
+	return c.Status(200).JSON(&node)
 }
