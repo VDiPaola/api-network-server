@@ -12,7 +12,9 @@ func HealthCheck(node models.Node) *models.Node {
 	//create node if not exists
 	currentNode := GetNode(node)
 	if currentNode == nil {
-		AddNode(node)
+		currentNode.Priority = 0
+		currentNode.Score = 100
+		currentNode = AddNode(node)
 	} else {
 		//update time
 		currentNode.LastResponseUnix = time.Now().Unix()

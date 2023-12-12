@@ -15,12 +15,12 @@ func NodeHealthCheck(c *fiber.Ctx) error {
 		return c.Status(503).SendString(err.Error())
 	}
 
-	fmt.Println("Running health check on node")
-	fmt.Printf("%+v\n", node)
-
 	if node.IP == "" {
 		node.IP = c.IP()
 	}
+
+	fmt.Printf("Added node with IP: %v", node.IP)
+
 	newNode := nodes.HealthCheck(node)
 
 	return c.Status(200).JSON(newNode)
