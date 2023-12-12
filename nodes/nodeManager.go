@@ -35,18 +35,17 @@ func NodeExists(parsedNode models.Node) bool {
 
 func AddNodes(nodeArray []models.Node) {
 	for _, node := range nodeArray {
-		AddNode(node)
+		AddNode(&node)
 	}
 }
 
-func AddNode(node models.Node) *models.Node {
+func AddNode(node *models.Node) {
 	node.IsActive = true
 	node.LastResponseUnix = time.Now().Unix()
 	node.RequestCount = 0
 	node.PingArray = make([]int64, 0)
 	node.ResponseTimeArray = make([]int64, 0)
-	nodes = append(nodes, node)
-	return &node
+	nodes = append(nodes, *node)
 }
 
 func cleanNodes() {
