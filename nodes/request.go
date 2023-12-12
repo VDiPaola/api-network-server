@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -24,7 +23,6 @@ func Request(endpoint string, method helpers.RequestMethodType, body interface{}
 		processRequest(node, endpoint, method, body, func(response *http.Response, err error) {
 			if !hasSent {
 				hasSent = true
-				log.Printf("responseingisng: %v", response)
 				callback(response, err)
 			}
 		})
