@@ -3,6 +3,7 @@ package nodes
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"time"
@@ -47,7 +48,7 @@ func processRequest(node models.Node, endpoint string, method helpers.RequestMet
 		return
 	}
 
-	req, err := http.NewRequest(method.ToString(), endpoint, jsonBuffer)
+	req, err := http.NewRequest(helpers.RequestMethod.POST.ToString(), fmt.Sprintf("http://%v:%v/api-network/request", node.IP, node.Port), jsonBuffer)
 
 	if err != nil {
 		callback(nil, err)
