@@ -3,7 +3,9 @@ package nodes
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"time"
@@ -22,6 +24,7 @@ func Request(endpoint string, method helpers.RequestMethodType, body interface{}
 		processRequest(node, endpoint, method, body, func(response *http.Response, err error) {
 			if !hasSent {
 				hasSent = true
+				log.Printf("responseingisng: %v", response)
 				callback(response, err)
 			}
 		})
@@ -66,19 +69,20 @@ func processRequest(node models.Node, endpoint string, method helpers.RequestMet
 		return
 	}
 
-	diff := time.Since(start)
-
-	//check valid response
-	if res.StatusCode != 200 {
-		callback(nil, err)
+	if res == nil {
+		callback(nil, errors.New("Response returned nil"))
 		return
 	}
 
-	//check times
-	if diff > options.MaxResponseDuration {
-		node.Score -= 1
-	} else if diff < time.Millisecond*20 {
-		node.Score += 1
+	diff := time.Since(start)
+
+	if res.StatusCode != 200 {
+		//check times
+		if diff > options.MaxResponseDuration {
+			node.Score -= 1
+		} else if diff < time.Millisecond*20 {
+			node.Score += 1
+		}
 	}
 
 	//return results in callback function
