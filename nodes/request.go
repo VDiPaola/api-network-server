@@ -50,15 +50,21 @@ func processRequest(node models.Node, endpoint string, method helpers.RequestMet
 
 	//create request
 	req, err := http.NewRequest(helpers.RequestMethod.POST.ToString(), fmt.Sprintf("http://%v:%v/api-network/request", node.IP, node.Port), jsonBuffer)
-	req.Header.Set("Content-Type", "application/json")
 
 	if err != nil {
 		callback(nil, err)
 		return
 	}
 
+	req.Header.Set("Content-Type", "application/json")
+
 	//send request
 	res, err := http.DefaultClient.Do(req)
+
+	if err != nil {
+		callback(nil, err)
+		return
+	}
 
 	diff := time.Since(start)
 
