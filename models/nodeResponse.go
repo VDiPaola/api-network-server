@@ -2,7 +2,7 @@ package models
 
 type NodeResponseType struct {
 	Status     int32
-	statusText string
-	json       string
-	text       string
+	StatusText string
+	JSON       string
+	Text       string
 }
